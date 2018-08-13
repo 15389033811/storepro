@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+        <!--Redis连接池配置-->
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <!--控制一个pool可分配多少个jedis实例-->
+        <property name="maxTotal" value="${redis.pool.maxActive}"></property>
+        <!--连接池最多可空闲maxIdle个链接，这里取值为20，表示即便没有数据库连接仍保持20个空闲-->
+        <property name="maxIdle" value="${redis.pool.maxIdle}"></property>
+        <!--最大等待时间：，当没有可用连接时，连接池等待连接被归还的最大时间，超过时间则抛出异常-->
+        <property name="maxWaitMillis" value="${redis.pool.maxWait}"></property>
+        <!--在获取连接的时候检查有效性-->
+        <property name="testOnBorrow" value="${redis.pool.testOnBorrow}"></property>
+    </bean>
+    <!--创建redis连接池，并做相关配置-->
+    <bean id="jedisWritePool" class="storepro.cache.JedisPoolWriper" depends-on="jedisPoolConfig">
+        <constructor-arg index="0" ref="jedisPoolConfig"></constructor-arg>
+        <constructor-arg index="1" value="${redis.hostname}"></constructor-arg>
+        <constructor-arg index="2" value="${redis.port}" type="int"></constructor-arg>
+    </bean>
+
+    <!--创建redis工具类，封装好redis的连接进行相关的操作-->
+     <bean id="jedisUtil" class="storepro.cache.JedisUtil" scope="singleton">
+         <property name="jedisPool">
+             <ref bean="jedisWritePool"></ref>
+         </property>
+     </bean>
+
+    <!-- Redis的key操作 -->
+    <bean id="jedisKeys" class="storepro.cache.JedisUtil$Keys"
+          scope="singleton">
+        <constructor-arg ref="jedisUtil"></constructor-arg>
+    </bean>
+    <!-- Redis的Strings操作 -->
+    <bean id="jedisStrings" class="storepro.cache.JedisUtil$Strings"
+          scope="singleton">
+        <constructor-arg ref="jedisUtil"></constructor-arg>
+    </bean>
+    <!-- Redis的Lists操作 -->
+    <bean id="jedisLists" class="storepro.cache.JedisUtil$Lists"
+          scope="singleton">
+        <constructor-arg ref="jedisUtil"></constructor-arg>
+    </bean>
+    <!-- Redis的Sets操作 -->
+    <bean id="jedisSets" class="storepro.cache.JedisUtil$Sets"
+          scope="singleton">
+        <constructor-arg ref="jedisUtil"></constructor-arg>
+    </bean>
+    <!-- Redis的HashMap操作 -->
+    <bean id="jedisHash" class="storepro.cache.JedisUtil$Hash"
+          scope="singleton">
+        <constructor-arg ref="jedisUtil"></constructor-arg>
+    </bean>
+</beans>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="storepro.dao.ProductCategoryDao">
+        <!--查询商品id信息-->
+        <select id="queryProductCategoryList" resultType="productCategory" >
+       select
+       product_category_id,
+       product_category_name,
+       priority,
+       create_time,
+       shop_id
+       FROM tb_product_category where shop_id=#{shopId}
+       ORDER BY
+       priority
+       DESC
+    </select>
+
+   <!--批量增加商品信息-->
+    <!--collection:表示类型
+        item="productCategory" 表示每个元素
+        index="index" 下标
+        separator=","表示每个列名之间通过什么分割
+        注意：insert into 后面的列名顺序和valuse（）里的属性名顺序必须相同
+
+    -->
+    <insert id="batchInsertProductCategory" parameterType="java.util.List" >
+       INSERT   INTO tb_product_category(product_category_name,priority,create_time,shop_id)
+       VALUES
+       <foreach collection="list" item="productCategory" index="index" separator=",">
+          (
+              #{productCategory.productCategoryName},
+              #{productCategory.priority},
+              #{productCategory.createTime},
+               #{productCategory.shopId}
+
+          )
+       </foreach>
+
+    </insert>
+    
+    
+    <!--删除指定店铺的指定商品-->
+    <delete id="deleteProductCategory">
+      DELETE FROM tb_product_category
+      WHERE
+      product_category_id=#{productCategoryId}
+      AND
+      shop_id=#{shopId}
+    </delete>
+</mapper>

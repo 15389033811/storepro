@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="storepro.dao.ShopCategoryDao">
+        <select id="queryShopCategory" resultType="shopCategory">
+            SELECT
+            shop_category_id ,
+            shop_category_name,
+            shop_category_desc,
+            shop_category_img,
+            priority,
+            create_time,
+            last_edit_time,
+            parent_id
+            FROM
+            tb_shop_category
+            <where>
+       <!--我们查询店铺的话都是查询二级店铺,就是有父类型店铺,一级店铺像是一个选择界面, 点击后进入二级界面-->
+
+                <!--查询所有基类别显示在首页-->
+                <if test="shopCategoryCondition== null">
+                    and parent_id IS   NULL
+                </if>
+                <!--查询所有二级类别供我们需要时使用-->
+                <if test="shopCategoryCondition!= null">
+                    and parent_id IS  NOT  NULL
+                </if>
+                <!--显示一级类别相同的二级类别-->
+                <if test="shopCategoryCondition!= null and shopCategoryCondition.parent != null and shopCategoryCondition.parent.shopCategoryId != null">
+                    and parent_id=#{shopCategoryCondition.parent.shopCategoryId}
+                </if>
+
+            </where>
+            ORDER BY priority
+            DESC
+
+    </select>
+
+
+
+</mapper>

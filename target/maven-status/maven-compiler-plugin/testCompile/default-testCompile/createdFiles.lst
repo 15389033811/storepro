@@ -1,0 +1,5 @@
+storepro\service\ShopServiceTest.class
+storepro\service\AreaServiceTest.class
+storepro\dao\AreaDaoTest.class
+storepro\BaseTest.class
+storepro\dao\ShopDaoTest.class
